@@ -20,12 +20,12 @@ namespace MapsterMapValue
 
             Console.WriteLine("Map Original");
             var originalMap = localMapper.Map<User, UserVm>(user);
-            ConsoleObjectToString(originalMap);
+            ObjectToStringLineIntoConsole(originalMap);
             Console.WriteLine();
 
             Console.WriteLine("Map by value");
             var valueMap = localMapper.Map<User, UserVm>(user, "Description", "I Nicholas a ne Kolya");
-            ConsoleObjectToString(valueMap);
+            ObjectToStringLineIntoConsole(valueMap);
             Console.WriteLine();
 
             Console.WriteLine("Map by collection");
@@ -33,12 +33,12 @@ namespace MapsterMapValue
             users.Add(new User("Petya", 16));
             users.Add(new User("Slavik", 17));
             var valueMapList = localMapper.Map<IEnumerable<User>, ICollection<UserVm>>(users, nameof(UserVm.Description), "I map common description");
-            ConsoleObjectToString(valueMapList.ToArray());
+            ObjectToStringLineIntoConsole(valueMapList.ToArray());
 
             Console.ReadLine();
         }
 
-        private static void ConsoleObjectToString<T>(params T[] source) where T : class, new()
+        private static void ObjectToStringLineIntoConsole<T>(params T[] source) where T : class, new()
         {
             for (var index = 0; index < source.Length;)
             {
