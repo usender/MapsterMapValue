@@ -32,7 +32,7 @@ namespace MapsterMapValue
             var users = new List<User>();
             users.Add(new User("Petya", 16));
             users.Add(new User("Slavik", 17));
-            var valueMapList = localMapper.Map<IEnumerable<User>, ICollection<UserVm>>(users, "Description", "I map common description");
+            var valueMapList = localMapper.Map<IEnumerable<User>, ICollection<UserVm>>(users, nameof(UserVm.Description), "I map common description");
             ConsoleObjectToString(valueMapList.ToArray());
 
             Console.ReadLine();
@@ -67,7 +67,7 @@ namespace MapsterMapValue
 
         public object MapDescription(MapContext context)
         {
-            var value = context.Parameters["Description"];
+            var value = context.Parameters[nameof(UserVm.Description)];
             return value;
         }
     }
