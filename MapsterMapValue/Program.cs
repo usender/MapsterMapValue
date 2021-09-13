@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -23,7 +24,7 @@ namespace MapsterMapValue
             Console.WriteLine();
 
             Console.WriteLine("Map by value");
-            var valueMap = localMapper.Map<User, UserVm>(user, x => x.Description, "I Nicholas a ne Kolya");
+            var valueMap = localMapper.Map<User, UserVm>(user, "Description", "I Nicholas a ne Kolya");
             ConsoleObjectToString(valueMap);
             Console.WriteLine();
 
@@ -31,7 +32,7 @@ namespace MapsterMapValue
             var users = new List<User>();
             users.Add(new User("Petya", 16));
             users.Add(new User("Slavik", 17));
-            var valueMapList = localMapper.Map<User, UserVm>(users, x => x.Description, "I map common description");
+            var valueMapList = localMapper.Map<IEnumerable<User>, ICollection<UserVm>>(users, "Description", "I map common description");
             ConsoleObjectToString(valueMapList.ToArray());
 
             Console.ReadLine();
@@ -61,7 +62,13 @@ namespace MapsterMapValue
                 .Map(x => x.Description,
                     x => MapContext.Current == null
                         ? default
-                        : MapContext.Current.Parameters[$"{nameof(UserVm)}.{nameof(UserVm.Description)}"]);
+                        : MapDescription(MapContext.Current));
+        }
+
+        public object MapDescription(MapContext context)
+        {
+            var value = context.Parameters["Description"];
+            return value;
         }
     }
 
@@ -71,10 +78,7 @@ namespace MapsterMapValue
     public interface IMapper
     {
         TDest Map<TSource, TDest>(TSource obj);
-        TDest Map<TSource, TDest>(TSource obj, Expression<Func<TDest, string>> expr, object value);
-
-        List<TDest> Map<TSource, TDest>(List<TSource> obj);
-        List<TDest> Map<TSource, TDest>(List<TSource> obj, Expression<Func<TDest, string>> expr, object value);
+        TDest Map<TSource, TDest>(TSource obj, string propName, object value);
     }
 
     public class Mapper : IMapper
@@ -91,27 +95,11 @@ namespace MapsterMapValue
             return obj != null ? _mapper.Map<TDest>(obj) : default;
         }
 
-        public TDest Map<TSource, TDest>(TSource obj, Expression<Func<TDest, string>> expr, object value)
+        public TDest Map<TSource, TDest>(TSource obj, string name, object value)
         {
-            var propName = ((MemberExpression)expr.Body).Member.Name;
-
             return obj.BuildAdapter()
-                .AddParameters($"{typeof(TDest).Name}.{propName}", value)
+                .AddParameters(name, value)
                 .AdaptToType<TDest>();
-        }
-
-        public List<TDest> Map<TSource, TDest>(List<TSource> obj)
-        {
-            return _mapper.Map<List<TDest>>(obj);
-        }
-
-        public List<TDest> Map<TSource, TDest>(List<TSource> obj, Expression<Func<TDest, string>> expr, object value)
-        {
-            var propName = ((MemberExpression)expr.Body).Member.Name;
-
-            return obj.BuildAdapter()
-                .AddParameters($"{typeof(TDest).Name}.{propName}", value)
-                .AdaptToType<List<TDest>>();
         }
     }
 
