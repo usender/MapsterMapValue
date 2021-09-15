@@ -47,13 +47,6 @@ namespace MapsterMapValue
             }
         }
 
-        private static User GenerateUser()
-        {
-            var user = new User(GenerateString(8), _rnd.Next(18, 99));
-            user.Roles = Range(1).Select((_, i) => new Role { Id = i + 1, Name = GenerateString(4) }).ToList();
-            return user;
-        }
-
         private static IMapper GetLocalMapper()
         {
             MapsterMapper.IMapper mMapper = new MapsterMapper.Mapper();
@@ -63,7 +56,8 @@ namespace MapsterMapValue
             return localMapper;
         }
 
-        private static string GenerateString(int len) => string.Join("", Range(4).Select(x => (char)('A' + _rnd.Next(0, 26)))).ToLower();
+        private static User GenerateUser() => new User(GenerateString(8), _rnd.Next(18, 99), Range(1).Select((_, i) => new Role(i + 1, GenerateString(4))));
+        private static string GenerateString(int len) => string.Join("", Range(len).Select(x => (char)('A' + _rnd.Next(0, 26)))).ToLower();
         private static string Range(int count, char c = '_') => string.Join("", Enumerable.Repeat(c, count));
         private static void ConsoleWriteEndLine() => Console.WriteLine(Range(100, '-'));
     }
@@ -135,10 +129,11 @@ namespace MapsterMapValue
 
     class User
     {
-        public User(string name, int age)
+        public User(string name, int age, IEnumerable<Role> roles)
         {
             Age = age;
             Name = name;
+            Roles = roles.ToList();
         }
 
         public string Name { get; set; }
@@ -149,6 +144,12 @@ namespace MapsterMapValue
 
     class Role
     {
+        public Role(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+
         public string Name { get; set; }
         public int Id { get; set; }
     }
