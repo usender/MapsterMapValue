@@ -18,12 +18,12 @@ namespace MapsterMapValue
             var user = GenerateUser();
             Console.WriteLine("Map Original");
             var originalMap = localMapper.Map<User, UserVm>(user);
-            ObjectToStringLineIntoConsole(originalMap);
+            ConsoleWriteJsonObject(originalMap);
             ConsoleWriteEndLine();
 
             Console.WriteLine("Map by value");
             var valueMap = localMapper.Map<User, UserVm>(user, "Description", "I Nicholas a ne Kolya");
-            ObjectToStringLineIntoConsole(valueMap);
+            ConsoleWriteJsonObject(valueMap);
             ConsoleWriteEndLine();
 
             Console.WriteLine("Map by collection");
@@ -31,17 +31,17 @@ namespace MapsterMapValue
             users.Add(GenerateUser());
             users.Add(GenerateUser());
             var valueMapList = localMapper.Map<IList<User>, IList<UserVm>>(users, nameof(UserVm.Description), "Common description for user and roles");
-            ObjectToStringLineIntoConsole(valueMapList.ToArray());
+            ConsoleWriteJsonObject(valueMapList.ToArray());
 
             Console.ReadLine();
         }
 
-        private static void ObjectToStringLineIntoConsole<T>(params T[] source) where T : class, new()
+        private static void ConsoleWriteJsonObject<T>(params T[] source)
         {
             for (int i = 0; i < source.Length;)
             {
                 var obj = source[i++];
-                if (source.Length > 1) 
+                if (source.Length > 1)
                     Console.WriteLine($"Index: {i}");
                 Console.WriteLine(obj.ToJson());
             }
@@ -54,16 +54,6 @@ namespace MapsterMapValue
             return user;
         }
 
-        private static string GenerateString(int len)
-        {
-            return string.Join("", Range(4).Select(x =>
-            {
-                int num = _rnd.Next(0, 26);
-                char let = (char)('A' + num);
-                return let;
-            })).ToLower();
-        }
-
         private static IMapper GetLocalMapper()
         {
             MapsterMapper.IMapper mMapper = new MapsterMapper.Mapper();
@@ -73,6 +63,7 @@ namespace MapsterMapValue
             return localMapper;
         }
 
+        private static string GenerateString(int len) => string.Join("", Range(4).Select(x => (char)('A' + _rnd.Next(0, 26)))).ToLower();
         private static string Range(int count, char c = '_') => string.Join("", Enumerable.Repeat(c, count));
         private static void ConsoleWriteEndLine() => Console.WriteLine(Range(100, '-'));
     }
@@ -161,7 +152,7 @@ namespace MapsterMapValue
         public string Name { get; set; }
         public int Id { get; set; }
     }
-    
+
     #endregion
 
     #region View models
